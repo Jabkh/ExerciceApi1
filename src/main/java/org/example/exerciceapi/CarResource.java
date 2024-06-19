@@ -1,5 +1,6 @@
 package org.example.exerciceapi;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.example.exerciceapi.model.Voiture;
@@ -10,7 +11,8 @@ import java.util.List;
 @Path("/cars")
 public class CarResource {
 
-    private CarService carService = new CarService();
+    @Inject
+    private CarService carService;
 
     @GET
     @Path("/{id}")

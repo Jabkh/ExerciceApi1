@@ -2,48 +2,58 @@ package org.example.exerciceapi.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import org.example.exerciceapi.model.Voiture;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ApplicationScoped
 public class CarService {
 
-    private static int cntCars = 0;
-    private static List<Voiture> voitures = new ArrayList<>();
+    private SessionFactory sessionFactory;
 
     public CarService() {
-//        voitures.add(new Voiture(1, "Opel", 1962, "Beige"));
-//        voitures.add(new Voiture(2, "Audi", 1983, "Bordeau"));
-//        voitures.add(new Voiture(3, "Lada", 1985, "Marron"));
+        sessionFactory = new Configuration().configure().buildSessionFactory();
     }
 
     public List<Voiture> getVoitures() {
-        return voitures;
+        try (Session session = sessionFactory.openSession()) {
+            return session.createQuery("SELECT v FROM Voiture v", Voiture.class).getResultList();
+        }
     }
 
     public Voiture getVoiture(int id) {
-        return voitures.stream().filter(voiture -> voiture.getId() == id).findFirst().orElse(null);
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(Voiture.class, id);
+        }
     }
 
     public void addVoiture(Voiture voiture) {
-        if (voiture.getId() == 0) {
-            voiture.setId(++cntCars);
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.save(voiture);
+            session.getTransaction().commit();
         }
-        voitures.add(voiture);
     }
 
     public Voiture updateVoiture(Voiture voiture) {
-        int index = voitures.indexOf(getVoiture(voiture.getId()));
-        if (index != -1) {
-            voitures.set(index, voiture);
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+            session.update(voiture);
+            session.getTransaction().commit();
             return voiture;
         }
-        return null;
     }
 
     public void deleteVoiture(int id) {
-        voitures.removeIf(voiture -> voiture.getId() == id);
+        try (Session session = sessionFactory.openSession()) {
+            Voiture voiture = getVoiture(id);
+            if (voiture != null) {
+                session.beginTransaction();
+                session.delete(voiture);
+                session.getTransaction().commit();
+            }
+        }
     }
 }
