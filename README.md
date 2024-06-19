@@ -1,1 +1,1 @@
-<img src="./capture4.png" width="300px" height="auto" />
+<img src="./capture4.png" width="800px" height="auto" />
