@@ -1,32 +1,52 @@
 package org.example.exerciceapi;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.example.exerciceapi.model.Voiture;
+import org.example.exerciceapi.service.CarService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("/cars")
 public class CarResource {
 
+    private CarService carService = new CarService();
+
     @GET
-    @Path("/one")
+    @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Voiture getOneCar() {
-        return new Voiture(1, "Tesla", 2022, "Rouge");
+    public Voiture getOneCar(@PathParam("id") int id) {
+        return carService.getVoiture(id);
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Voiture> getAllCars() {
+        return carService.getVoitures();
+    }
 
-        List<Voiture> voitures = new ArrayList<>();
-        voitures.add(new Voiture(1, "Toyota", 2023, "Gris"));
-        voitures.add(new Voiture(2, "Ford", 2020, "Noir"));
-        voitures.add(new Voiture(3, "Mercedes", 1965, "Blanc"));
-        return voitures;
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Voiture createCar(Voiture voiture) {
+        carService.addVoiture(voiture);
+        return voiture;
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Voiture updateCar(@PathParam("id") int id, Voiture voiture) {
+        if (voiture.getId() != id) {
+            throw new BadRequestException("ID in URL does not match ID in Voiture object");
+        }
+        return carService.updateVoiture(voiture);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void deleteCar(@PathParam("id") int id) {
+        carService.deleteVoiture(id);
     }
 }
