@@ -47,4 +47,14 @@ public class Voiture {
     public void setCouleur(String couleur) {
         this.couleur = couleur;
     }
+
+    @Override
+    public String toString() {
+        return "Voiture{" +
+                "id=" + id +
+                ", marque='" + marque + '\'' +
+                ", anneeDeFabrication=" + anneeDeFabrication +
+                ", couleur='" + couleur + '\'' +
+                '}';
+    }
 }
